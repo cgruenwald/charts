@@ -11,4 +11,14 @@ entries:
     urls:
     - capi-cluster-0.1.1.tgz
     version: 0.1.1
-generated: "2025-06-08T03:59:27.311526802Z"
+  cert-manager-crds:
+  - apiVersion: v2
+    appVersion: v1.17.2
+    created: "2025-06-08T04:18:53.643097983Z"
+    digest: 7d98ba3d6045f6174e14690065aff9f91fe90d9362a1b359e65c19d92a2ab38a
+    name: cert-manager-crds
+    type: application
+    urls:
+    - cert-manager-crds-0.1.0.tgz
+    version: 0.1.0
+generated: "2025-06-08T04:18:53.643106079Z"
