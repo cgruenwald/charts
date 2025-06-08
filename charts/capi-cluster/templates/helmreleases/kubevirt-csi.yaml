@@ -1,3 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kubevirt-csi-node
+  namespace: {{ .Release.Namespace }}
+spec:
+  interval: 24h
+  url: https://cgruenwald.github.io/charts
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -10,11 +19,11 @@ spec:
   releaseName: csi
   chart:
     spec:
-      chart: ./charts/kubevirt-csi-node
+      chart: kubevirt-csi-node
       sourceRef:
-        kind: GitRepository
-        name: flux-system
-        namespace: flux-system
+        kind: HelmRepository
+        name: kubevirt-csi-node
+        namespace: {{ .Release.Namespace }}
       reconcileStrategy: Revision
   kubeConfig:
     secretRef:
