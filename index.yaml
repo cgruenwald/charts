@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  capi-cluster:
+  - apiVersion: v2
+    appVersion: 1.32.4
+    created: "2025-06-08T03:59:27.311521211Z"
+    description: Managed Kubernetes service
+    digest: 400559e9f375e8111d71d0687ae2a63f3d8b9649064d85c3ddbee91f3723762f
+    name: capi-cluster
+    type: application
+    urls:
+    - capi-cluster-0.1.1.tgz
+    version: 0.1.1
+generated: "2025-06-08T03:59:27.311526802Z"
