@@ -1,0 +1,12 @@
+{{- range .Values.helmRepositorys }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: {{ .name }}
+  namespace: {{ .namespace | default $.Release.Namespace }}
+spec:
+  interval: 10m
+  url: {{ .url }}
+  timeout: 60s
+{{- end }}

@@ -1,11 +1,3 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: kubevirt-csi-node
-  namespace: {{ .Release.Namespace }}
-spec:
-  interval: 24h
-  url: https://cgruenwald.github.io/charts
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,12 +14,12 @@ spec:
       chart: kubevirt-csi-node
       sourceRef:
         kind: HelmRepository
-        name: kubevirt-csi-node
+        name: cgruenwald
         namespace: {{ .Release.Namespace }}
       reconcileStrategy: Revision
   kubeConfig:
     secretRef:
-      name: {{ .Release.Name }}-kubevirt-admin-kubeconfig
+      name: {{ .Release.Name }}-admin-kubeconfig
       key: super-admin.svc
   targetNamespace: kube-system
   storageNamespace: kube-system
@@ -42,4 +34,11 @@ spec:
   values:
     storageClass: "{{ . }}"
   {{- end }}      
+  dependsOn:
+  {{- if lookup "helm.toolkit.fluxcd.io/v2" "HelmRelease" .Release.Namespace .Release.Name }}
+  - name: {{ .Release.Name }}
+    namespace: {{ .Release.Namespace }}
+  {{- end }}
+  - name: {{ .Release.Name }}-cilium
+    namespace: {{ .Release.Namespace }}
    

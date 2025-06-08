@@ -1,1 +1,60 @@
+## @section Common Parameters
+
+## @param storageClass StorageClass used to store user data.
+##
 storageClass: piraeus-replicated
+
+cluster:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 10.243.0.0/16
+    serviceDomain: cluster.local
+    services:
+      cidrBlocks:
+      - 10.95.0.0/16
+  addons:
+    coreDNS:
+      dnsServiceIPs:
+      - 10.95.0.10
+    konnectivity:
+      server:
+        port: 8132
+
+## @section Cluster Addons
+##
+addons:
+
+  ## Cilium CNI plugin
+  ##
+  cilium:
+    ## @param addons.cilium.valuesOverride Custom values to override
+    valuesOverride: {}
+
+  ## Ingress-NGINX Controller
+  ##
+  ingressNginx:
+    ## @param addons.ingressNginx.enabled Enable the Ingress-NGINX controller (requires nodes labeled with the 'ingress-nginx' role).
+    ## @param addons.ingressNginx.valuesOverride Custom values to override
+    ##
+    enabled: false
+    ## @param addons.ingressNginx.hosts List of domain names that the parent cluster should route to this tenant cluster.
+    ## e.g:
+    ## hosts:
+    ## - example.org
+    ## - foo.example.net
+    ##
+    hosts: []
+    valuesOverride: {}
+
+
+## @section Helm Repositories
+##
+  ## List of Helm repositories to add to the tenant cluster.
+helmRepositorys:
+  - name: cgruenwald
+    url: https://cgruenwald.github.io/charts
+  - name: cilium
+    url: https://helm.cilium.io  
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx  

@@ -5,18 +5,14 @@ metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
+  {{- with .Values.cluster.clusterNetwork }}
   clusterNetwork:
-    pods:
-      cidrBlocks:
-      - 10.243.0.0/16
-    serviceDomain: cluster.local
-    services:
-      cidrBlocks:
-      - 10.95.0.0/16
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1alpha1
     kind: KamajiControlPlane
-    name: {{ .Release.Name }}-kubevirt
+    name: {{ .Release.Name }}
     namespace: {{ .Release.Namespace }}
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
@@ -39,7 +35,7 @@ spec:
 apiVersion: controlplane.cluster.x-k8s.io/v1alpha1
 kind: KamajiControlPlane
 metadata:
-  name: {{ .Release.Name }}-kubevirt
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
     cluster.x-k8s.io/role: control-plane
@@ -48,14 +44,10 @@ metadata:
 spec:
   dataStoreName: kamaji-etcd
   dataStoreSchema: {{ .Release.Namespace }}
+  {{- with .Values.cluster.addons }}
   addons:
-    coreDNS:
-      dnsServiceIPs:
-      - 10.95.0.10
-    konnectivity:
-      server:
-        port: 8132
-#    kubeProxy: { }
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   kubelet:
     cgroupfs: systemd
     preferredAddressTypes:
@@ -81,24 +73,22 @@ spec:
       virtualMachineTemplate:
         metadata:
           namespace: {{ .Release.Namespace }}
-#          annotations:
-#            kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+          labels:
+            cluster.x-k8s.io/role: worker
+            node-role.kubernetes.io/worker: ""
         spec:
           runStrategy: Always
           template:
+            metadata:
+              annotations:
+                kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+              labels:
+                cluster.x-k8s.io/deployment-name: {{ .Release.Name }}-md-0                
+                cluster.x-k8s.io/role: worker
+                node-role.kubernetes.io/worker: ""  
             spec:
-#              dnsPolicy: ClusterFirstWithHostNet
-#              dnsConfig:
-#                nameservers:
-#                - 192.168.1.1
-#                - 1.1.1.1
-#                searches:
-#                - default.svc.cluster.local
-#                - svc.cluster.local
-#                - cluster.local
               domain:
                 cpu:
-#                  treads: 1
                   cores: 2
                   sockets: 1
                 devices:
@@ -119,7 +109,7 @@ spec:
               evictionStrategy: External
               volumes:
               - containerDisk:
-                  image: ghcr.io/cgruenwald/goatystack/ubuntu-container-disk:latest
+                  image: ghcr.io/cgruenwald/goatystack/ubuntu-container-disk:{{ .Chart.AppVersion }}
                 name: containervolume
               - name: ephemeral
                 emptyDisk:
@@ -145,20 +135,20 @@ spec:
       mounts:
       - ["LABEL=ephemeral", "/ephemeral"]
       - ["/ephemeral/kubelet", "/var/lib/kubelet", "none", "bind,nofail"]
-#      - ["/ephemeral/containerd", "/var/lib/containerd", "none", "bind,nofail"]
+      - ["/ephemeral/containerd", "/var/lib/containerd", "none", "bind,nofail"]
       preKubeadmCommands:
       - sed -i 's|root:x:|root::|' /etc/passwd
       - systemctl stop containerd.service
       - mkdir -p /ephemeral/kubelet /ephemeral/containerd
       - mount -o bind /ephemeral/kubelet /var/lib/kubelet
-#      - mount -o bind /ephemeral/containerd /var/lib/containerd
+      - mount -o bind /ephemeral/containerd /var/lib/containerd
       - systemctl start containerd.service
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs: {}
         discovery:
           bootstrapToken:
-            apiServerEndpoint: "{{ .Release.Name }}-kubevirt.{{ .Release.Namespace }}.svc:6443"
+            apiServerEndpoint: "{{ .Release.Name }}.{{ .Release.Namespace }}.svc:6443"
       initConfiguration:
         skipPhases:
         - addon/kube-proxy

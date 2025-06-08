@@ -1,11 +1,3 @@
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
-metadata:
-  name: cilium
-  namespace: {{ .Release.Namespace }}
-spec:
-  interval: 24h
-  url: https://helm.cilium.io
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -28,7 +20,7 @@ spec:
       reconcileStrategy: Revision
   kubeConfig:
     secretRef:
-      name: {{ .Release.Name }}-kubevirt-admin-kubeconfig
+      name: {{ .Release.Name }}-admin-kubeconfig
       key: super-admin.svc
   targetNamespace: kube-system
   storageNamespace: kube-system

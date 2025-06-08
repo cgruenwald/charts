@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-kcsi-driver
-        policy.cozystack.io/allow-to-apiserver: "true"
     spec:
       enableServiceLinks: false
       serviceAccountName: {{ .Release.Name }}-kcsi
@@ -27,7 +26,7 @@ spec:
       containers:
         - name: csi-driver
           imagePullPolicy: Always
-          image: ghcr.io/cgruenwald/goatystack/kubevirt-csi-driver:latest
+          image: ghcr.io/cgruenwald/goatystack/kubevirt-csi-driver:{{ .Chart.AppVersion }}
           args:
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--infra-cluster-namespace=$(INFRACLUSTER_NAMESPACE)"
@@ -138,5 +137,5 @@ spec:
         - name: socket-dir
           emptyDir: {}
         - secret:
-            secretName: {{ .Release.Name }}-kubevirt-admin-kubeconfig
+            secretName: {{ .Release.Name }}-admin-kubeconfig
           name: kubeconfig
