@@ -21,4 +21,14 @@ entries:
     urls:
     - cert-manager-crds-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-08T04:18:53.643106079Z"
+  kubevirt-csi-node:
+  - apiVersion: v2
+    appVersion: 1.32.5
+    created: "2025-06-08T04:23:19.007135481Z"
+    digest: 3360779dd08318a4cfd524c6989ccbe0ca1ac2d84bad5699f82c0e99e4eefff5
+    name: kubevirt-csi-node
+    type: application
+    urls:
+    - kubevirt-csi-node-0.1.1.tgz
+    version: 0.1.1
+generated: "2025-06-08T04:23:19.007148195Z"
