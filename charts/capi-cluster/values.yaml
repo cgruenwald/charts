@@ -4,6 +4,13 @@
 ##
 storageClass: piraeus-replicated
 
+openshift:
+  enableAnyuidSCC: false
+  route:
+    enabled: false
+    host: kubevirt-cluster-api.example.com
+  
+
 cluster:
   clusterNetwork:
     pods:
@@ -20,6 +27,16 @@ cluster:
     konnectivity:
       server:
         port: 8132
+  network:
+#    ingress:
+#      className: openshift-default
+#      extraAnnotations:
+#        nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+#      hostname: kubevirt-cluster-01-api.example.com
+    serviceType: ClusterIP
+    certSANs:
+    - kubevirt-cluster-api.example.com
+  ## @param cluster.enableAnyuidSCC Enable the 'anyuid' Security Context Constraint (SCC) for the Serviceaccount used by kamajicontrolplane.
 
 ## @section Cluster Addons
 ##

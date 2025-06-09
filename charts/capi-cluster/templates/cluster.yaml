@@ -54,9 +54,12 @@ spec:
 #    - Hostname
     - InternalIP
     - ExternalIP
+  {{- with .Values.cluster.network }}
   network:
-    serviceType: LoadBalancer
-  deployment: {}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  deployment:
+    serviceAccountName: {{ .Release.Name }}-sa
   replicas: 2
   version: {{ .Chart.AppVersion }}
 ---
@@ -73,19 +76,12 @@ spec:
       virtualMachineTemplate:
         metadata:
           namespace: {{ .Release.Namespace }}
-          labels:
-            cluster.x-k8s.io/role: worker
-            node-role.kubernetes.io/worker: ""
         spec:
           runStrategy: Always
           template:
             metadata:
-              annotations:
-                kubevirt.io/allow-pod-bridge-network-live-migration: "true"
-              labels:
-                cluster.x-k8s.io/deployment-name: {{ .Release.Name }}-md-0                
-                cluster.x-k8s.io/role: worker
-                node-role.kubernetes.io/worker: ""  
+#              annotations:
+#                kubevirt.io/allow-pod-bridge-network-live-migration: "true"
             spec:
               domain:
                 cpu:
@@ -103,7 +99,7 @@ spec:
                   - name: default
                     bridge: {}
 #                    masquerade: {}
-#                  networkInterfaceMultiqueue: true
+                  networkInterfaceMultiqueue: true
                 memory:
                   guest: 4Gi
               evictionStrategy: External
@@ -164,6 +160,8 @@ spec:
   selector:
     matchLabels: null
   template:
+    metadata:
+      namespace: {{ .Release.Namespace }}
     spec:
       bootstrap:
         configRef:
@@ -178,3 +176,23 @@ spec:
         name: {{ .Release.Name }}-md-0
         namespace: {{ .Release.Namespace }}
       version: v{{ .Chart.AppVersion }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: {{ .Release.Name }}-md-0
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: {{ .Release.Name }}
+  nodeStartupTimeout: 10m
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/cluster-name: {{ .Release.Name }}
+      cluster.x-k8s.io/deployment-name: {{ .Release.Name }}-md-0
+  unhealthyConditions:
+  - type: Ready
+    status: Unknown
+    timeout: 30s
+  - type: Ready
+    status: "False"
+    timeout: 300s
