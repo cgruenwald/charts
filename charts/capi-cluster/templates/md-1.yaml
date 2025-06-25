@@ -1,0 +1,97 @@
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{ .Release.Name }}-md-1
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-min-size: {{ .Values.cluster.nodeGroups.md1.minSize | quote }}
+    cluster.x-k8s.io/cluster-api-autoscaler-node-group-max-size: {{ .Values.cluster.nodeGroups.md1.maxSize | quote }}
+    capacity.cluster-autoscaler.kubernetes.io/memory: {{ .Values.cluster.nodeGroups.md1.memory | quote }}
+    capacity.cluster-autoscaler.kubernetes.io/cpu: {{ .Values.cluster.nodeGroups.md1.cpu | quote }}
+spec:
+  clusterName: capi-cluster-01
+  progressDeadlineSeconds: 60
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{ .Release.Name }}-md-0
+          namespace: {{ .Release.Namespace }}
+      clusterName: capi-cluster-01
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+        kind: KubevirtMachineTemplate
+        name: {{ .Release.Name }}-md-1
+        namespace: {{ .Release.Namespace }}
+      version: {{ .Chart.AppVersion }}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: {{ .Release.Name }}-md-1
+  namespace: {{ .Release.Namespace }}
+spec:
+  clusterName: capi-cluster-01
+  nodeStartupTimeout: 3m
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/deployment-name: {{ .Release.Name }}-md-1
+  unhealthyConditions:
+  - type: Ready
+    status: Unknown
+    timeout: 30s
+  - type: Ready
+    status: "False"
+    timeout: 100s
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: KubevirtMachineTemplate
+metadata:
+  name: {{ .Release.Name }}-md-1
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    spec:
+      virtualMachineBootstrapCheck:
+        checkStrategy: ssh
+      virtualMachineTemplate:
+        spec:
+          runStrategy: Always
+          template:
+#            metadata:
+#              annotations:
+#                kubevirt.io/allow-pod-bridge-network-live-migration: "true"
+            spec:
+              domain:
+                cpu:
+                  cores: {{ .Values.cluster.nodeGroups.md1.cpu }}
+                memory:
+                  guest: {{ .Values.cluster.nodeGroups.md1.memory }}
+                devices:
+                  disks:
+                  - name: containervolume
+                    disk:
+                      bus: virtio
+                  - name: ephemeral
+                    disk:
+                      bus: virtio
+                  interfaces:
+                  - name: default
+                    bridge: {}
+                  networkInterfaceMultiqueue: true
+              evictionStrategy: External
+              volumes:
+              - name: containervolume
+                containerDisk:
+                  image: ghcr.io/cgruenwald/goatystack/ubuntu-container-disk:{{ .Chart.AppVersion }}
+              - name: ephemeral
+                emptyDisk:
+                  capacity: {{ .Values.nodeGroups.md1.diskSize }}
+              networks:
+              - name: default
+                pod: {}

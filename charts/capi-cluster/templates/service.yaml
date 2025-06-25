@@ -15,4 +15,5 @@ spec:
     targetPort: 443
   selector:
     cluster.x-k8s.io/cluster-name: {{ .Release.Name }}
-    node-role.kubernetes.io/worker: ""
+    cluster.x-k8s.io/role: worker
+  type: NodePort

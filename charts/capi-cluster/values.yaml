@@ -9,7 +9,7 @@ openshift:
   route:
     enabled: false
     host: kubevirt-cluster-api.example.com
-  
+
 
 cluster:
   clusterNetwork:
@@ -37,10 +37,28 @@ cluster:
     certSANs:
     - kubevirt-cluster-api.example.com
   ## @param cluster.enableAnyuidSCC Enable the 'anyuid' Security Context Constraint (SCC) for the Serviceaccount used by kamajicontrolplane.
-
+nodeGroups:
+  md0:
+    replicas: 3
+    cpu: 2
+    memory: 8Gi
+    diskSize: 20Gi
+  md1:
+    minReplicas: 1
+    maxReplicas: 5
+    cpu: 4
+    memory: 16Gi
+    diskSize: 40Gi
 ## @section Cluster Addons
 ##
 addons:
+  ## Cert-manager: automatically creates and manages SSL/TLS certificate
+  ##
+  certManager:
+    ## @param addons.certManager.enabled Enable cert-manager, which automatically creates and manages SSL/TLS certificates.
+    ## @param addons.certManager.valuesOverride Custom values to override
+    enabled: false
+    valuesOverride: {}
 
   ## Cilium CNI plugin
   ##
@@ -72,6 +90,8 @@ helmRepositorys:
   - name: cgruenwald
     url: https://cgruenwald.github.io/charts
   - name: cilium
-    url: https://helm.cilium.io  
+    url: https://helm.cilium.io
   - name: ingress-nginx
-    url: https://kubernetes.github.io/ingress-nginx  
+    url: https://kubernetes.github.io/ingress-nginx
+  - name: jetstack
+    url: https://charts.jetstack.io

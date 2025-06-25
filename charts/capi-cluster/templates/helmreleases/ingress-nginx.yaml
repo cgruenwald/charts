@@ -1,18 +1,17 @@
 {{- define "capi-cluster.defaultIngressValues" -}}
-ingress-nginx:
-  fullnameOverride: ingress-nginx
-  controller:
-    kind: DaemonSet
-    hostNetwork: true
-    service:
+fullnameOverride: ingress-nginx
+controller:
+  kind: DaemonSet
+  hostNetwork: true
+  service:
+    enabled: false
+  {{- if not .Values.addons.certManager.enabled }}
+  admissionWebhooks:
+    certManager:
       enabled: false
-    {{- if not .Values.addons.certManager.enabled }}
-    admissionWebhooks:
-      certManager:
-        enabled: false
-    {{- end }}
-  nodeSelector:
-    node-role.kubernetes.io/worker: ""
+  {{- end }}
+nodeSelector:
+  node-role.kubernetes.io/worker: ""
 {{- end }}
 
 {{- if .Values.addons.ingressNginx.enabled }}

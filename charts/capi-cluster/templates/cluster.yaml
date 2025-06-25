@@ -85,7 +85,7 @@ spec:
             spec:
               domain:
                 cpu:
-                  cores: 2
+                  cores: {{ .Values.cluster.nodeGroups.md0.cpu }}
                   sockets: 1
                 devices:
                   disks:
@@ -101,7 +101,7 @@ spec:
 #                    masquerade: {}
                   networkInterfaceMultiqueue: true
                 memory:
-                  guest: 4Gi
+                  guest: {{ .Values.cluster.nodeGroups.md0.memory }}
               evictionStrategy: External
               volumes:
               - containerDisk:
@@ -109,7 +109,7 @@ spec:
                 name: containervolume
               - name: ephemeral
                 emptyDisk:
-                  capacity: 20Gi
+                  capacity: {{ .Values.nodeGroups.md0.diskSize }}
               networks:
               - name: default
                 pod: {}
