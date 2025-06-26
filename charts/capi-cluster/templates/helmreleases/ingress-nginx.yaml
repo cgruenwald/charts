@@ -3,6 +3,8 @@ fullnameOverride: ingress-nginx
 controller:
   kind: DaemonSet
   hostNetwork: true
+  config:
+    strict-validate-path-type: "false"
   service:
     enabled: false
   {{- if not .Values.addons.certManager.enabled }}

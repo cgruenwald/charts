@@ -5,6 +5,7 @@
 storageClass: piraeus-replicated
 
 openshift:
+  ## @param openshift.enableAnyuidSCCEnable the 'anyuid' Security Context Constraint (SCC) for the Serviceaccount used by kamajicontrolplane.
   enableAnyuidSCC: false
   route:
     enabled: false
@@ -36,7 +37,6 @@ cluster:
     serviceType: ClusterIP
     certSANs:
     - kubevirt-cluster-api.example.com
-  ## @param cluster.enableAnyuidSCC Enable the 'anyuid' Security Context Constraint (SCC) for the Serviceaccount used by kamajicontrolplane.
 nodeGroups:
   md0:
     replicas: 3
@@ -44,6 +44,7 @@ nodeGroups:
     memory: 8Gi
     diskSize: 20Gi
   md1:
+    enabled: true
     minReplicas: 1
     maxReplicas: 5
     cpu: 4

@@ -3,16 +3,13 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: {{ .Release.Name }}-cilium
-  labels:
-    cozystack.io/repository: system
-    cozystack.io/target-cluster-name: {{ .Release.Name }}
 spec:
   interval: 5m
   releaseName: cilium
   chart:
     spec:
       chart: cilium
-      version: "1.17.2"
+      version: "1.17.5"
       sourceRef:
         kind: HelmRepository
         name: cilium
