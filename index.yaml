@@ -3,6 +3,16 @@ entries:
   capi-cluster:
   - apiVersion: v2
     appVersion: 1.32.5
+    created: "2025-06-26T14:39:21.488867484Z"
+    description: Managed Kubernetes service
+    digest: 911a6d94a6daa002e1e43fba742fa6cdd0332a9eff6bb76e12fcd3018c5a439b
+    name: capi-cluster
+    type: application
+    urls:
+    - capi-cluster-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.32.5
     created: "2025-06-09T21:06:16.529153429Z"
     description: Managed Kubernetes service
     digest: 70fb5e6d0d0b61c2b9aedb3ce62ed53c976bce131ef181593ca5e3aa6d2023ba
@@ -51,4 +61,4 @@ entries:
     urls:
     - kubevirt-csi-node-0.1.1.tgz
     version: 0.1.1
-generated: "2025-06-09T21:06:16.529166955Z"
+generated: "2025-06-26T14:39:21.488911166Z"
